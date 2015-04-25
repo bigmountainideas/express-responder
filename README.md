@@ -98,7 +98,7 @@ Middleware
 
 Request Methods
 
-``` req.continueOrError(err, data, next) ```
+``` req.continueOrError(err, next) ```
 
 Response Methods
 
