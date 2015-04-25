@@ -1,21 +1,15 @@
 Express.js Responder
 --------------------
 
+Express.js middleware abstracting error vs success responses.
+
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![Build][travis-image]][travis-url]
+
 ### INSTALLING
 
 ```$ npm install express-responder --save```
-
-### DEPENDENCIES
-
-"Bernard of Chartres used to compare us to [puny] dwarfs perched on the shoulders of giants. He pointed out that we see more and farther than our predecessors, not because we have keener vision or greater height, but because we are lifted up and borne aloft on their gigantic stature." [Quoted From](http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants)
-
-This module depends on the great work of:
-
-* [debug](https://www.npmjs.com/package/debug)
-* [errors](https://www.npmjs.com/package/errors)
-* [express-validator](https://www.npmjs.com/package/express-validator)
-
-and all of the other modules that make up these packages.
 
 ### FEATURES
 
@@ -125,6 +119,20 @@ Debugging is implemented using the [debug](http://npmjs.org/packages/debug) modu
 process.env.DEBUG = 'express-responder'
 ```
 
+
+### DEPENDENCIES
+
+"Bernard of Chartres used to compare us to [puny] dwarfs perched on the shoulders of giants. He pointed out that we see more and farther than our predecessors, not because we have keener vision or greater height, but because we are lifted up and borne aloft on their gigantic stature." [Quoted From](http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants)
+
+This module depends on the great work of:
+
+* [debug](https://www.npmjs.com/package/debug)
+* [errors](https://www.npmjs.com/package/errors)
+* [express-validator](https://www.npmjs.com/package/express-validator)
+
+and all of the other modules that make up these packages.
+
+
 ### LICENSE
 
 ```
@@ -151,3 +159,11 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
+
+
+[npm-image]: https://img.shields.io/npm/v/express-responder.svg
+[npm-url]: https://npmjs.org/package/express-responder
+[downloads-image]: https://img.shields.io/npm/dm/express-responder.svg
+[downloads-url]: https://npmjs.org/package/express-responder
+[travis-image]: https://img.shields.io/travis/bigmountainideas/express-responder/master.svg
+[travis-url]: https://travis-ci.org/bigmountainideas/express-responder
