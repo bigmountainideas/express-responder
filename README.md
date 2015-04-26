@@ -83,7 +83,6 @@ app.get('/api/v1/user/:id/books', function(req,res,next){
 
 // ... After all your routes
 express.use(responder.respond());
-express.use(responder.handleErrors());
 ```
 
 
