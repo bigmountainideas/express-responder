@@ -56,7 +56,7 @@ var responder = require('express-responder')();
 var express = require('express');
 var app = express();
 
-express.use(responder.continue());
+app.use(responder.continue());
 // ... Other middleware like session and static
 
 app.get('/api/v1/users', function(req,res,next){
@@ -82,7 +82,7 @@ app.get('/api/v1/user/:id/books', function(req,res,next){
 });
 
 // ... After all your routes
-express.use(responder.respond());
+app.use(responder.respond());
 ```
 
 
