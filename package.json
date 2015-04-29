@@ -1,6 +1,6 @@
 {
   "name": "express-responder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Express.js middleware abstracting error vs success responses.",
   "main": "index.js",
   "scripts": {
