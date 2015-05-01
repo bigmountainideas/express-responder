@@ -6,6 +6,7 @@ Express.js middleware abstracting error vs success responses.
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build][travis-image]][travis-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 ### INSTALLING
 
@@ -257,3 +258,5 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 [downloads-url]: https://npmjs.org/package/express-responder
 [travis-image]: https://img.shields.io/travis/bigmountainideas/express-responder/master.svg
 [travis-url]: https://travis-ci.org/bigmountainideas/express-responder
+[coveralls-image]: https://coveralls.io/repos/bigmountainideas/express-responder/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/r/bigmountainideas/express-responder?branch=master
