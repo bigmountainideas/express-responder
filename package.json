@@ -31,7 +31,10 @@
     "mocha": "^2.2.4",
     "docco": "^0.7.0",
     "supertest": "^0.15.0",
-    "body-parser": "^1.12.3"
+    "body-parser": "^1.12.3",
+    "coveralls": "^2.11.2",
+    "mocha-lcov-reporter": "0.0.2",
+    "jade": "^1.9.2"
   },
   "dependencies": {
     "errors": "^0.2.0",

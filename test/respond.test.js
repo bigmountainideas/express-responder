@@ -23,6 +23,7 @@ describe('respond', function(){
     .set('Accept', 'application/json')
     .expect(200)
     .end(function(err, res){
+      res.should.be.json;
       done(err);
     });
 
@@ -44,6 +45,9 @@ describe('respond', function(){
     .set('Accept', 'application/xml')
     .expect(200)
     .end(function(err, res){
+
+      res.text.should.eql('<?xml version="1.0" encoding="UTF-8"?>\n<data>\n\t<a>1</a>\n\t<b>true</b>\n</data>');
+
       done(err);
     });
   });
@@ -51,12 +55,14 @@ describe('respond', function(){
   it('should respond with html', function(done){
     var app = createApp();
 
-    app.set('views', path.resolve(__dirname),'./fixtures/views');
+    app.set('views', path.resolve(__dirname,'./fixtures/views'));
+    app.set('view engine', 'jade');
 
     app.use(responder.continue());
 
     app.get('/', function(req,res,next){
-      res.continueOrError(null, {a:1,b:true}, next);
+      res.template = 'home';
+      res.continueOrError(null, {title:'a Test page',content:'hello world!'}, next);
       next();
     });
 
@@ -67,6 +73,8 @@ describe('respond', function(){
     .set('Accept', 'text/html')
     .expect(200)
     .end(function(err, res){
+      res.should.be.html;
+      res.text.should.startWith('<!DOCTYPE html>');
       done(err);
     });
   });
