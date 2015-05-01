@@ -30,17 +30,49 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> debug = <span class="hljs-built_in">require</span>(<span class="hljs-string">'debug'</span>);
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
+ *
+ *
+ *
+ *
+ */</span>
+
+
+<span class="hljs-comment">/*!
+ * Import module dependencies
+ */</span>
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> debug = <span class="hljs-built_in">require</span>(<span class="hljs-string">'debug'</span>);
 <span class="hljs-keyword">var</span> validator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express-validator'</span>);
 <span class="hljs-keyword">var</span> errors = <span class="hljs-built_in">require</span>(<span class="hljs-string">'errors'</span>);
+<span class="hljs-keyword">var</span> moment = <span class="hljs-built_in">require</span>(<span class="hljs-string">'moment'</span>);
+<span class="hljs-keyword">var</span> xml = <span class="hljs-built_in">require</span>(<span class="hljs-string">'js2xmlparser'</span>);
 
-<span class="hljs-keyword">var</span> exports = <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
-  <span class="hljs-keyword">var</span> _debug = debug(options.debug || <span class="hljs-string">'express-responder'</span>);
+<span class="hljs-comment">/*!
+ * Object to be exported
+ */</span>
+<span class="hljs-keyword">var</span> exports = <span class="hljs-built_in">module</span>.exports;
+
+
+<span class="hljs-comment">/*!
+ * Default options for module
+ */</span>
+exports.defaults = {
+  debug: <span class="hljs-string">'express-responder'</span>
+};
+
+
+<span class="hljs-comment">/*!
+ * Continue middleware
+ */</span>
+exports.continue = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
+  options = _.defaults(options || {}, exports.defaults);
+  <span class="hljs-keyword">var</span> log = debug(options.debug);
   <span class="hljs-keyword">var</span> middlewareStack = [ validator() ];
 
   middlewareStack.push(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( req, res, next)</span></span>{
 
-    _debug( <span class="hljs-string">'Registering response middleware for path: %s'</span>, req.path);</pre></div></div>
+    log( <span class="hljs-string">'Registering response middleware for path: %s'</span>, req.path);</pre></div></div>
             
         </li>
         
@@ -86,7 +118,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    res.shouldContinue = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,data)</span></span>{
-      _debug( <span class="hljs-string">'Should continue %s'</span>, (data &amp;&amp; !err));
+      log( <span class="hljs-string">'Should continue %s'</span>, (data &amp;&amp; !err));
       <span class="hljs-keyword">return</span> (data &amp;&amp; !err);
     };</pre></div></div>
             
@@ -104,17 +136,18 @@
             
             <div class="content"><div class='highlight'><pre>    res.respondIfError = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,next)</span></span>{
       <span class="hljs-keyword">if</span>( err){
-        _debug( <span class="hljs-string">'[HttpError] %j'</span>, err);
+        log( <span class="hljs-string">'[HttpError] %j'</span>, err);
         <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> next === <span class="hljs-string">'function'</span>){
           next( <span class="hljs-keyword">new</span> errors.Http500Error({
             explanation: err.message
           }));
+        }
         <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
       }<span class="hljs-keyword">else</span>{
-        _debug( <span class="hljs-string">'No errors in response'</span>);
+        log( <span class="hljs-string">'No errors in response'</span>);
         <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
       }
-    }</pre></div></div>
+    };</pre></div></div>
             
         </li>
         
@@ -129,34 +162,134 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    res.continueOrError = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,data,next)</span></span>{
-      _debug( <span class="hljs-string">'Responding to path %s'</span>, req.path);
-      _debug( <span class="hljs-string">'Continue or error [%j] [%j]'</span>, err, data);
+      log( <span class="hljs-string">'Responding to path %s'</span>, req.path);
+      log( <span class="hljs-string">'Continue or error [%j] [%j]'</span>, err, data);
 
       <span class="hljs-keyword">var</span> respondedWithError = res.respondIfError( err, next);
 
       <span class="hljs-keyword">if</span>( !respondedWithError){
-        _debug( <span class="hljs-string">'Continuing with response'</span>);
+        log( <span class="hljs-string">'Continuing with response'</span>);
         <span class="hljs-keyword">if</span>( !data &amp;&amp; !err){
-          _debug( <span class="hljs-string">'Resource not found'</span>);
-          <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> === <span class="hljs-string">'function'</span>){
+          log( <span class="hljs-string">'Resource not found'</span>);
+          <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> next === <span class="hljs-string">'function'</span>){
             next(<span class="hljs-keyword">new</span> errors.Http404Error());
           }
           <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
         }<span class="hljs-keyword">else</span>{
-          res.locals({ response: data});
-          <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> === <span class="hljs-string">'function'</span>){
+          res.locals.response = data;
+          <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> next === <span class="hljs-string">'function'</span>){
             next();
           }
         }
       }
       <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-    }
+    };
 
     next();
 
   });
 
   <span class="hljs-keyword">return</span> middlewareStack;
+};
+
+
+<span class="hljs-comment">/*!
+ * Respond middleware
+ */</span>
+exports.respond = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(options)</span></span>{
+
+  errors.stacks( -<span class="hljs-number">1</span> !== ([
+      <span class="hljs-string">'development'</span>,
+      <span class="hljs-string">'test'</span>
+    ]).indexOf( process.env.NODE_ENV)
+  );
+
+  <span class="hljs-keyword">var</span> respondNotFound = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res,next)</span></span>{
+    <span class="hljs-keyword">if</span>( !res.locals.response){
+      next(<span class="hljs-keyword">new</span> errors.Http404Error());
+    }<span class="hljs-keyword">else</span>{
+      next();
+    }
+  };
+
+  <span class="hljs-keyword">var</span> respondWithError = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,req,res,next)</span></span>{
+    <span class="hljs-keyword">if</span>( !err || (err &amp;&amp; !(err <span class="hljs-keyword">instanceof</span> errors.HttpError))){
+
+      <span class="hljs-keyword">var</span> stack, errOpts = {};
+      <span class="hljs-keyword">if</span>( err){
+        errOpts.explanation = err.toString();
+      }
+      <span class="hljs-keyword">if</span>( errorr.stacks() &amp;&amp; err &amp;&amp; (stack=err.stack)){
+        errOpts.originalStack = stack;
+      }
+      err = <span class="hljs-keyword">new</span> errors.Http500Error(errOpts);
+    }
+
+    res.locals.response = {
+      error : err,
+      date  : moment().format()
+    };
+
+    res.status(err.status || <span class="hljs-number">500</span>);
+
+    next();
+  };
+
+  <span class="hljs-keyword">var</span> sendResponse = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res,next)</span></span>{
+    <span class="hljs-keyword">var</span> response = res.locals.response;
+
+    <span class="hljs-keyword">if</span>( !response.hasOwnProperty(<span class="hljs-string">'error'</span>)){
+      response = {
+        data: response
+      };
+    }
+
+    res.format({
+      text: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        res.send(response.toString());
+      },
+
+      xml: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        res.send(xml(<span class="hljs-string">'data'</span>,response.data));
+      },
+
+      html: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+
+        res.render( res.template, response, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, html)</span></span>{
+
+          <span class="hljs-keyword">if</span>( !err){
+            res.send( html);
+          }<span class="hljs-keyword">else</span>{
+
+            <span class="hljs-keyword">var</span> renderError = <span class="hljs-keyword">new</span> errors.Http500Error({
+              explanation   : err.message,
+              originalStack : err.stack
+            });
+
+            res.status(renderError.status)
+            .render( <span class="hljs-string">'error'</span>, {
+              error: renderError.toJSON()
+            });
+          }
+
+        });
+      },
+
+      json: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        res.json(response);
+      },
+
+      jsonp: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        res.jsonp(response);
+      },
+
+      <span class="hljs-string">'default'</span>: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        res.status(<span class="hljs-number">406</span>).send(<span class="hljs-string">'Not Acceptable'</span>);
+      }
+    });
+  };
+
+  <span class="hljs-keyword">return</span> [ respondNotFound, respondWithError, sendResponse];
 };</pre></div></div>
             
         </li>
