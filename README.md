@@ -21,7 +21,7 @@ Express.js middleware abstracting error vs success responses.
 
 The rationale behind this module is to reduce the amount of repetitive code required to validate a request cycle in express.js/ connect. Ever find yourself writing code like this?
 
-```javascript
+```js
 function(req,res,next){
   UserModel.findOne({
     _id:"anemail@adomain.com"
@@ -38,7 +38,7 @@ function(req,res,next){
 
 We were tired of seeing this throughout our express.js apps so this module was born, converting the above into this:
 
-```javascript
+```js
 function(req,res,next){
   UserModel.findOne({
     _id:"anemail@adomain.com"
@@ -51,7 +51,7 @@ function(req,res,next){
 
 
 Basic usage
-```javascript
+```js
 var responder = require('express-responder')();
 var express = require('express');
 var app = express();
@@ -60,24 +60,9 @@ app.use(responder.continue());
 // ... Other middleware like session and static
 
 app.get('/api/v1/users', function(req,res,next){
-  User.findOne({
-    email: "anemail@adomain.com"
-  })
+  UserModel.find()
   .exec(function(err, user){
     res.continueOrError(err, user, next);
-  });
-});
-
-app.get('/api/v1/user/:id/books', function(req,res,next){
-  async.parallel({
-    user: function(done){
-
-    },
-    book: function(done){
-
-    }
-  }, function(err, results){
-    res.continueOrError(err, results);
   });
 });
 
@@ -89,32 +74,138 @@ app.use(responder.respond());
 ### API
 
 
-Middleware
+###### Middleware
 
-``` responder.continue([options]) ```
+* ``` responder.continue([options]) ```
 
-``` responder.respond([options]) ```
+  Register the middleware exposing the methods below on request and response objects.
 
-Request Methods
+* ``` responder.respond([options]) ```
 
-``` req.continueOrError(err, next) ```
+  Register middleware to handle 404 and Error responses, along with content negotiation. Supports `html`, `json`, `xml`, `jsonp`, and `text`.
 
-Response Methods
+###### Request Methods
 
-``` res.shouldContinue(err, data) ```
+* ``` req.continueOrError(err, next) ```
 
-``` res.respondIfError(err, next) ```
+  Check the request for errors using either [express-validator](https://www.npmjs.com/package/express-validator) methods or pass your own custom errors as the first parameter. If an error is found, the response will be an `Http400Error`.
 
-``` res.continueOrError(err, data, next) ```
+  ```js
+
+  var users = {
+    1: {
+      books: [
+        'Growth Engines',
+        'It\'s Not About The F-Stops'
+      ]
+    },
+    2: {
+      books: [
+        'Design For How People Learn',
+        'Smart Information Systems'
+      ]
+    }
+  };
+
+  app.get('/api/v1/user/:id/books', function(req,res,next){
+    // Do some request validation on `id` parameter.
+    req.checkParams('id').isInt();
+
+    // Custom validation
+    var err;
+    if( !users.hasOwnProperty(req.params.id)){
+      err = new Error('User does not exist');
+    }
+
+    // If id is not a number or an error is passed as the first
+    // parameter, the error will get returned to the client as
+    // 400 status.
+    req.continueOrError(err, next);
+  });
+  ```
+
+###### Response Methods
+
+* ``` res.shouldContinue(err, data) ```
+
+  Convenience method that returns `true` if there is data and there is no error, `false` otherwise. If you need to check for an error and still do more before actually responding.
+
+  ```js
+  app.get('/api/v1/user/:id/books', function(req,res,next){
+    async.parallel({
+      user: function(done){
+        done(null, {name:'John'});
+      },
+      book: function(done){
+        done(null, {book:'Hello World!'});
+      }
+    }, function(err, results){
+
+      if( res.shouldContinue(err, results)){
+
+        var book = results[1].book;
+        var user = results[0].name;
+
+        var responseData = {
+          user: user,
+          book: book
+        };
+
+        res.continueOrError(err, responseData, next);
+      }else{
+        next(new Error('There was an error.'));
+      }
+
+    });
+  });
+  ```
 
 
-### DEBUGGIN
+* ``` res.respondIfError(err, next) ```
+
+  Responds if an error was passed and return `true` otherwise just return `false` allowing for further processing inside middleware.
+
+  ```js
+  app.get('/api/v1/user/:id/books', function(req,res,next){
+
+    UserModel.findOne({
+      _id: req.params.id
+    }, function(err, user){
+
+      if( !res.respondIfError(err,next)){
+        BooksModel.find({
+          _id: user.books[0]
+        }, function(err, books){
+          res.continueOrError(err, books, next);
+        });
+      }
+
+    });
+
+  });
+  ```
+
+* ``` res.continueOrError(err, data, next) ```
+
+  Continue onto next matching middleware saving `data` as `res.locals.response` or respond with `error`.
+
+  ```js
+  app.get('/api/v1/users', function(req,res,next){
+    UserModel.find()
+    .exec(function(err, user){
+      res.continueOrError(err, user, next);
+    });
+  });
+  ```
+
+
+### DEBUG
 
 Debugging is implemented using the [debug](http://npmjs.org/packages/debug) module.
 
 ```$ DEBUG=express-responder npm start```
 
-```javascript
+```js
 process.env.DEBUG = 'express-responder'
 ```
 
@@ -123,7 +214,7 @@ process.env.DEBUG = 'express-responder'
 
 "Bernard of Chartres used to compare us to [puny] dwarfs perched on the shoulders of giants. He pointed out that we see more and farther than our predecessors, not because we have keener vision or greater height, but because we are lifted up and borne aloft on their gigantic stature." [Quoted From](http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants)
 
-This module depends on the great work of:
+This module is primarily built on:
 
 * [debug](https://www.npmjs.com/package/debug)
 * [errors](https://www.npmjs.com/package/errors)
