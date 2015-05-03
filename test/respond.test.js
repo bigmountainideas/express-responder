@@ -45,9 +45,7 @@ describe('respond', function(){
     .set('Accept', 'application/xml')
     .expect(200)
     .end(function(err, res){
-
-      res.text.should.eql('<?xml version="1.0" encoding="UTF-8"?>\n<data>\n\t<a>1</a>\n\t<b>true</b>\n</data>');
-
+      res.text.should.eql('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<response>\n\t<data>\n\t\t<a>1</a>\n\t\t<b>true</b>\n\t</data>\n</response>');
       done(err);
     });
   });
