@@ -17,6 +17,8 @@ Express.js middleware abstracting error vs success responses.
 * Middleware control flow
 * Uniformed error handling
 * Request validation
+* Response validation
+* Content-Type repsonse negotiation
 
 ### USAGE
 
@@ -77,13 +79,58 @@ app.use(responder.respond());
 
 ###### Middleware
 
-* ``` responder.continue([options]) ```
+* ``` responder.continue() ```
 
   Register the middleware exposing the methods below on request and response objects.
 
 * ``` responder.respond([options]) ```
 
   Register middleware to handle 404 and Error responses, along with content negotiation. Supports `html`, `json`, `xml`, `jsonp`, and `text`.
+
+  **Options**
+
+  * ###### jsonpCallbackName
+
+    Change the querystring parameter used to detect a JSONP request.
+
+    *__Default__: 'callback'*
+
+    ```js
+    app.set('jsonp callback name', '__jsonpCallback__');
+
+    app.use(responder.respond({
+      jsonpCallbackName: app.get('jsonp callback name')
+    });
+    ```
+    
+  * ###### respondWith
+
+    Pass custom callbacks for each content-type.
+
+    ```js
+    app.use(responder.respond({
+      respondWith: {
+        text: function(res, response){
+          res.send('text');
+        },
+        json: function(res, response){
+          res.type('text').send('json');
+        },
+        jsonp: function(res, response){
+          res.type('text').send('jsonp');
+        },
+        xml: function(res, response){
+          res.send('xml');
+        },
+        html: function(res, response){
+          res.send('html');
+        },
+        default: function(res, response){
+          res.send('default');
+        }
+      }
+    }));
+    ```
 
 ###### Request Methods
 
