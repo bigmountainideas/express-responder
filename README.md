@@ -85,7 +85,7 @@ app.use(responder.respond());
 
 * ``` responder.respond([options]) ```
 
-  Register middleware to handle 404 and Error responses, along with content negotiation. Supports `html`, `json`, `xml`, `jsonp`, and `text`.
+  Register middleware to handle 404 and Error responses, along with content negotiation.
 
   **Options**
 
@@ -102,10 +102,10 @@ app.use(responder.respond());
       jsonpCallbackName: app.get('jsonp callback name')
     });
     ```
-    
+
   * ###### respondWith
 
-    Pass custom callbacks for each content-type.
+    Pass custom callbacks for each content-type. Supports `html`,  `json`, `xml`, `jsonp`, `text` and `default` types.
 
     ```js
     app.use(responder.respond({
@@ -236,6 +236,19 @@ app.use(responder.respond());
 * ``` res.continueOrError(err, data, next) ```
 
   Continue onto next matching middleware saving `data` as `res.locals.response` or respond with `error`.
+
+  ```js
+  app.get('/api/v1/users', function(req,res,next){
+    UserModel.find()
+    .exec(function(err, user){
+      res.continueOrError(err, user, next);
+    });
+  });
+  ```
+
+* ``` res.continue(data, next) ```
+
+  Explicitly continue onto next matching middleware saving `data` as `res.locals.response`.
 
   ```js
   app.get('/api/v1/users', function(req,res,next){

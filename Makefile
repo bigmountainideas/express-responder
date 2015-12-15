@@ -17,4 +17,10 @@ test-cov:
 	./node_modules/coveralls/bin/coveralls.js && \
 	rm -rf ./coverage
 
+test-cov-local:
+	@NODE_ENV=test ./node_modules/.bin/istanbul cover \
+	./node_modules/.bin/_mocha --report lcovonly -- \
+	-R $(REPORTER) && \
+	rm -rf ./coverage
+
 .PHONY: all test test-cov docs

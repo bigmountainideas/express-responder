@@ -82,4 +82,21 @@ describe( 'middleware', function(){
 
   });
 
+  it( 'should create method `continue` on all response objects', function(done){
+
+    var app = createApp();
+    app.use(responder.continue());
+
+    app.get('/', function(req,res,next){
+      res.should.have.property( 'continue');
+      res.continue.should.be.instanceof( Function);
+      done();
+    });
+
+    request(app)
+    .get('/')
+    .end();
+
+  });
+
 });

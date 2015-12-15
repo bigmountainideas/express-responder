@@ -85,7 +85,6 @@ describe('respond', function(){
 
     app.get('/', function(req,res,next){
       res.continueOrError(null, {a:1,b:true}, next);
-      next();
     });
 
     app.use(responder.respond());
@@ -110,9 +109,8 @@ describe('respond', function(){
     app.use(responder.continue());
 
     app.get('/', function(req,res,next){
-      res.template = 'home';
+      res.template('home');
       res.continueOrError(null, {title:'a Test page',content:'hello world!'}, next);
-      next();
     });
 
     app.use(responder.respond());
@@ -138,9 +136,8 @@ describe('respond', function(){
     app.use(responder.continue());
 
     app.get('/', function(req,res,next){
-      res.template = 'no existent template';
+      res.template('no existent template');
       res.continueOrError(null, {title:'a Test page',content:'hello world!'}, next);
-      next();
     });
 
     app.use(responder.respond());
@@ -272,7 +269,7 @@ describe('respond', function(){
       .expect(200, 'xml', done);
     });
 
-    it('should respond for `xml`', function(done){
+    it('should respond for `html`', function(done){
 
       request(app)
       .get('/')

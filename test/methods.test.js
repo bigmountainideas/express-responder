@@ -182,5 +182,51 @@ describe('res', function(){
 
   });
 
+  describe('.continue', function(){
+
+    it('should set the `res.locals.response` object using the first argument', function(done){
+
+      var app = createApp();
+      app.use(responder.continue());
+
+      app.get('/', function(req,res,next){
+        var obj = {success:true};
+        res.continue(obj);
+        res.locals.response.should.eql(obj);
+        res.sendStatus(200);
+      });
+
+      app.use(responder.respond());
+
+      request(app)
+      .get('/')
+      .set('Accept', 'application/json')
+      .expect(200, done);
+
+    });
+
+    it('should set the `res.locals.response` object and contiue to next middleware', function(done){
+
+      var app = createApp();
+      app.use(responder.continue());
+
+      app.get('/', function(req,res,next){
+        var obj = {success:true};
+        res.continue(obj, next);
+        res.locals.response.should.eql(obj);
+      });
+
+      app.use(responder.respond());
+
+      request(app)
+      .get('/')
+      .set('Accept', 'application/json')
+      .expect(200, /success/ig, done);
+
+    });
+
+  });
+
+
 
 });
