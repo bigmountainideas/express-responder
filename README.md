@@ -251,11 +251,8 @@ app.use(responder.respond());
   Explicitly continue onto next matching middleware saving `data` as `res.locals.response`.
 
   ```js
-  app.get('/api/v1/users', function(req,res,next){
-    UserModel.find()
-    .exec(function(err, user){
-      res.continueOrError(err, user, next);
-    });
+  app.get('/api/v1/status', function(req,res,next){
+    res.continue({status: 'ok'}, next);
   });
   ```
 
